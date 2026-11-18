@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nhà Phân Loại Tài Ba - Sapxep.org</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@700;900&display=swap');
+        .font-game { font-family: 'Montserrat', sans-serif; }
+    </style>
+</head>
+<body class="bg-slate-900 m-0 p-0 overflow-hidden select-none">
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect } = React;
+
+        // Định nghĩa 8 thẻ thiết bị thiết kế sắc nét, chi tiết chuẩn SGK
+        const ITEMS_DATA = [
+            { 
+                id: 1, name: "Màn hình", group: 1, num: 1, badgeColor: "bg-red-600",
+                svg: (
+                    <svg viewBox="0 0 140 110" className="w-32 h-24 object-contain drop-shadow">
+                        <rect x="10" y="10" width="120" height="75" rx="6" fill="#475569" stroke="#1e293b" strokeWidth="4"/>
+                        <rect x="16" y="16" width="108" height="63" fill="#38bdf8"/>
+                        <path d="M55 85 L85 85 L75 96 L65 96 Z" fill="#64748b"/>
+                        <ellipse cx="70" cy="98" rx="22" ry="4" fill="#334155"/>
+                    </svg>
+                )
+            },
+            { 
+                id: 2, name: "Chuột", group: 1, num: 2, badgeColor: "bg-teal-600",
+                svg: (
+                    <svg viewBox="0 0 90 110" className="w-20 h-28 object-contain drop-shadow">
+                        <path d="M35 25 L45 2" stroke="#1e293b" strokeWidth="4" fill="none"/>
+                        <ellipse cx="45" cy="62" rx="26" ry="36" fill="#f472b6" stroke="#db2777" strokeWidth="3"/>
+                        <path d="M19 62 Q45 50 71 62" stroke="#be185d" strokeWidth="3" fill="none"/>
+                        <ellipse cx="45" cy="38" rx="7" ry="12" fill="#38bdf8"/>
+                    </svg>
+                )
+            },
+            { 
+                id: 3, name: "Nồi cơm điện", group: 2, num: 3, badgeColor: "bg-amber-500",
+                svg: (
+                    <svg viewBox="0 0 110 100" className="w-28 h-24 object-contain drop-shadow">
+                        <ellipse cx="55" cy="20" rx="40" ry="10" fill="#cbd5e1" stroke="#94a3b8" strokeWidth="3"/>
+                        <path d="M15 20 C15 70 20 85 55 85 C90 85 95 70 95 20 Z" fill="#e2e8f0" stroke="#94a3b8" strokeWidth="3"/>
+                        <rect x="45" y="42" width="20" height="26" rx="3" fill="#334155"/>
+                        <circle cx="51" cy="51" r="3" fill="#ef4444"/>
+                        <circle cx="59" cy="51" r="3" fill="#22c55e"/>
+                    </svg>
+                )
+            },
+            { 
+                id: 4, name: "Máy sấy tóc", group: 2, num: 4, badgeColor: "bg-purple-600",
+                svg: (
+                    <svg viewBox="0 0 110 100" className="w-28 h-24 object-contain drop-shadow">
+                        <path d="M25 40 L50 40 L50 70 L35 90 L25 85 Z" fill="#334155"/>
+                        <rect x="25" y="25" width="60" height="32" rx="10" fill="#e11d48"/>
+                        <rect x="12" y="29" width="15" height="24" rx="5" fill="#1e293b"/>
+                        <path d="M35 90 L20 100" stroke="#1e293b" strokeWidth="4" fill="none"/>
+                    </svg>
+                )
+            },
+            { 
+                id: 5, name: "Thân máy", group: 1, num: 5, badgeColor: "bg-blue-600",
+                svg: (
+                    <svg viewBox="0 0 80 110" className="w-20 h-28 object-contain drop-shadow">
+                        <rect x="10" y="5" width="60" height="100" rx="6" fill="#1e293b" stroke="#0f172a" strokeWidth="3"/>
+                        <rect x="20" y="18" width="40" height="10" rx="3" fill="#334155"/>
+                        <rect x="20" y="34" width="40" height="10" rx="3" fill="#334155"/>
+                        <circle cx="40" cy="82" r="12" fill="#ef4444" stroke="#b91c1c" strokeWidth="2"/>
+                    </svg>
+                )
+            },
+            { 
+                id: 6, name: "Tủ lạnh", group: 2, num: 6, badgeColor: "bg-pink-600",
+                svg: (
+                    <svg viewBox="0 0 90 110" className="w-20 h-28 object-contain drop-shadow">
+                        <rect x="15" y="5" width="60" height="100" rx="4" fill="#cbd5e1" stroke="#64748b" strokeWidth="3"/>
+                        <line x1="15" y1="40" x2="75" y2="40" stroke="#64748b" strokeWidth="3"/>
+                        <rect x="60" y="18" width="6" height="16" rx="3" fill="#334155"/>
+                        <rect x="60" y="62" width="6" height="24" rx="3" fill="#334155"/>
+                    </svg>
+                )
+            },
+            { 
+                id: 7, name: "Bàn phím", group: 1, num: 7, badgeColor: "bg-green-600",
+                svg: (
+                    <svg viewBox="0 0 130 80" className="w-32 h-20 object-contain drop-shadow">
+                        <rect x="5" y="5" width="120" height="70" rx="8" fill="#334155" stroke="#1e293b" strokeWidth="3"/>
+                        <rect x="12" y="12" width="106" height="54" rx="4" fill="#1e293b"/>
+                        <rect x="38" y="48" width="54" height="12" rx="3" fill="#64748b"/>
+                    </svg>
+                )
+            },
+            { 
+                id: 8, name: "Quạt điện", group: 2, num: 8, badgeColor: "bg-red-700",
+                svg: (
+                    <svg viewBox="0 0 100 110" className="w-24 h-28 object-contain drop-shadow">
+                        <circle cx="50" cy="38" r="32" fill="none" stroke="#2563eb" strokeWidth="5"/>
+                        <circle cx="50" cy="38" r="8" fill="#1d4ed8"/>
+                        <path d="M50 70 L50 98" stroke="#15803d" strokeWidth="6" strokeLinecap="round"/>
+                        <ellipse cx="50" cy="103" rx="22" ry="5" fill="#16a34a"/>
+                    </svg>
+                )
+            }
+        ];
+
+        function App() {
+            const [started, setStarted] = useState(false);
+            const [items, setItems] = useState([]);
+            const [draggingId, setDraggingId] = useState(null);
+            const [dragPos, setDragPos] = useState({ x: 0, y: 0 });
+            const [shakeId, setShakeId] = useState(null);
+            const [completed, setCompleted] = useState(false);
+
+            const initGame = () => {
+                const shuffled = [...ITEMS_DATA].map(item => ({
+                    ...item,
+                    currentGroup: null,
+                    isCorrect: false
+                })).sort(() => Math.random() - 0.5);
+                setItems(shuffled);
+                setCompleted(false);
+            };
+
+            useEffect(() => {
+                initGame();
+            }, []);
+
+            const playTing = () => {
+                try {
+                    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+                    const osc = ctx.createOscillator();
+                    const gain = ctx.createGain();
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(880, ctx.currentTime);
+                    gain.gain.setValueAtTime(0.1, ctx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.5);
+                    osc.connect(gain);
+                    gain.connect(ctx.destination);
+                    osc.start();
+                    osc.stop(ctx.currentTime + 0.5);
+                } catch(e) {}
+            };
+
+            const handlePointerDown = (e, id) => {
+                const item = items.find(i => i.id === id);
+                if (item.currentGroup !== null) return;
+                setDraggingId(id);
+                setDragPos({ x: e.clientX, y: e.clientY });
+            };
+
+            const handlePointerMove = (e) => {
+                if (draggingId === null) return;
+                setDragPos({ x: e.clientX, y: e.clientY });
+            };
+
+            const handlePointerUp = (e) => {
+                if (draggingId === null) return;
+                const dropX = e.clientX;
+                const dropY = e.clientY;
+
+                const g1El = document.getElementById('zone-1');
+                const g2El = document.getElementById('zone-2');
+
+                let targetGroup = null;
+                if (g1El) {
+                    const rect = g1El.getBoundingClientRect();
+                    if (dropX >= rect.left && dropX <= rect.right && dropY >= rect.top && dropY <= rect.bottom) {
+                        targetGroup = 1;
+                    }
+                }
+                if (g2El) {
+                    const rect = g2El.getBoundingClientRect();
+                    if (dropX >= rect.left && dropX <= rect.right && dropY >= rect.top && dropY <= rect.bottom) {
+                        targetGroup = 2;
+                    }
+                }
+
+                if (targetGroup !== null) {
+                    const draggedItem = items.find(i => i.id === draggingId);
+                    if (draggedItem.group === targetGroup) {
+                        playTing();
+                        setItems(prev => {
+                            const updated = prev.map(i => i.id === draggingId ? { ...i, currentGroup: targetGroup, isCorrect: true } : i);
+                            if (updated.every(i => i.isCorrect)) {
+                                setCompleted(true);
+                            }
+                            return updated;
+                        });
+                    } else {
+                        setShakeId(draggingId);
+                        setTimeout(() => setShakeId(null), 500);
+                    }
+                }
+                setDraggingId(null);
+            };
+
+            if (!started) {
+                return (
+                    <div className="w-screen h-screen bg-gradient-to-br from-blue-900 via-indigo-900 to-slate-900 flex flex-col items-center justify-center font-game select-none p-4">
+                        <div className="bg-white/10 backdrop-blur-md p-10 sm:p-14 rounded-3xl border border-white/20 shadow-2xl text-center max-w-3xl w-full">
+                            <span className="text-6xl mb-4 inline-block">🏆</span>
+                            <h1 className="text-3xl sm:text-4xl md:text-5xl font-black text-yellow-400 drop-shadow-lg mb-6 tracking-wide whitespace-nowrap">
+                                NHÀ PHÂN LOẠI TÀI BA
+                            </h1>
+                            <p className="text-lg sm:text-xl text-blue-200 mb-8">Trò chơi tương tác phân loại thiết bị máy tính và đồ gia dụng dành cho học sinh tiểu học!</p>
+                            <button onClick={() => setStarted(true)} className="bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-400 hover:to-green-500 text-white text-2xl sm:text-3xl font-black px-12 py-5 rounded-2xl shadow-xl transition transform hover:scale-105 active:scale-95 border-b-4 border-green-800">
+                                BẮT ĐẦU CHƠI 🚀
+                            </button>
+                        </div>
+                    </div>
+                );
+            }
+
+            return (
+                <div 
+                    className="w-screen h-screen bg-sky-50 flex flex-col justify-between p-4 font-game select-none overflow-hidden relative"
+                    onPointerMove={handlePointerMove}
+                    onPointerUp={handlePointerUp}
+                >
+                    <header className="text-center py-1">
+                        <h1 className="text-2xl font-black text-blue-900 uppercase tracking-wider">Trò chơi: NHÀ PHÂN LOẠI TÀI BA</h1>
+                    </header>
+
+                    <div className="flex-1 grid grid-cols-4 gap-4 items-center justify-items-center px-6 my-2">
+                        {items.filter(i => i.currentGroup === null).map(item => (
+                            <div
+                                key={item.id}
+                                onPointerDown={(e) => handlePointerDown(e, item.id)}
+                                className={`bg-white rounded-2xl p-4 shadow-md border-2 border-slate-200 flex flex-col items-center gap-2 cursor-grab active:cursor-grabbing hover:shadow-xl transition transform hover:-translate-y-1 ${shakeId === item.id ? 'animate-bounce border-red-500 ring-4 ring-red-300' : ''}`}
+                            >
+                                <div className="h-24 flex items-center justify-center">{item.svg}</div>
+                                <div className="flex items-center gap-2">
+                                    <div className={`w-8 h-8 ${item.badgeColor} text-white font-bold flex items-center justify-center text-sm shadow`} style={{clipPath: 'polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%)'}}>
+                                        {item.num}
+                                    </div>
+                                    <span className="italic font-bold text-slate-700 text-lg">{item.name}</span>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-6 h-[40%] pb-2">
+                        <div id="zone-1" className="bg-blue-100 border-4 border-dashed border-blue-400 rounded-3xl p-4 flex flex-col shadow-inner">
+                            <h2 className="text-xl font-black text-blue-900 text-center mb-2">💻 Nhóm 1: Thiết bị máy tính</h2>
+                            <div className="flex-1 flex flex-wrap gap-3 overflow-y-auto items-center justify-center">
+                                {items.filter(i => i.currentGroup === 1).map(item => (
+                                    <div key={item.id} className="bg-white/90 border-2 border-green-500 rounded-xl px-3 py-1 flex items-center gap-2 shadow animate-pulse">
+                                        <div className="scale-50 origin-left -ml-4">{item.svg}</div>
+                                        <div className={`w-6 h-6 ${item.badgeColor} text-white font-bold flex items-center justify-center text-xs`} style={{clipPath: 'polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%)'}}>{item.num}</div>
+                                        <span className="italic font-bold text-slate-800 text-sm">{item.name}</span>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+
+                        <div id="zone-2" className="bg-amber-100 border-4 border-dashed border-amber-400 rounded-3xl p-4 flex flex-col shadow-inner">
+                            <h2 className="text-xl font-black text-amber-900 text-center mb-2">🏠 Nhóm 2: Đồ gia dụng</h2>
+                            <div className="flex-1 flex flex-wrap gap-3 overflow-y-auto items-center justify-center">
+                                {items.filter(i => i.currentGroup === 2).map(item => (
+                                    <div key={item.id} className="bg-white/90 border-2 border-green-500 rounded-xl px-3 py-1 flex items-center gap-2 shadow animate-pulse">
+                                        <div className="scale-50 origin-left -ml-4">{item.svg}</div>
+                                        <div className={`w-6 h-6 ${item.badgeColor} text-white font-bold flex items-center justify-center text-xs`} style={{clipPath: 'polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%)'}}>{item.num}</div>
+                                        <span className="italic font-bold text-slate-800 text-sm">{item.name}</span>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    </div>
+
+                    {draggingId !== null && (
+                        <div 
+                            className="fixed pointer-events-none z-50 bg-white p-4 rounded-2xl shadow-2xl border-4 border-blue-500 scale-110 flex flex-col items-center gap-2"
+                            style={{ left: dragPos.x - 70, top: dragPos.y - 70 }}
+                        >
+                            {items.find(i => i.id === draggingId)?.svg}
+                            <span className="italic font-bold text-slate-800">{items.find(i => i.id === draggingId)?.name}</span>
+                        </div>
+                    )}
+
+                    {completed && (
+                        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center">
+                            <div className="bg-white p-10 rounded-3xl shadow-2xl text-center max-w-lg border-8 border-yellow-400 animate-bounce">
+                                <span className="text-6xl mb-4 inline-block">🎉</span>
+                                <h2 className="text-3xl font-black text-blue-900 mb-4">Tuyệt vời! Các em đã hoàn thành xuất sắc!</h2>
+                                <button onClick={initGame} className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-black text-xl px-8 py-3 rounded-xl shadow-lg hover:scale-105 transition">
+                                    Chơi lại 🔄
+                                </button>
+                            </div>
+                        </div>
+                    )}
+                </div>
+            );
+        }
+
+        ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+    </script>
+</body>
+</html>
